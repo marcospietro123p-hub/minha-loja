@@ -48,25 +48,22 @@ button{
 
 <div class="container">
 
-<!-- PRODUTO 1 -->
 <div class="card">
-<h2>Plano diario</h2>
-<p>R$15</p>
-<button onclick="comprar('Plano Básico')">Comprar</button>
+<h2>Plano Básico</h2>
+<p>R$29</p>
+<button onclick="comprar('Plano diário')">Comprar</button>
 </div>
 
-<!-- PRODUTO 2 -->
 <div class="card">
-<h2>Plano semanal</h2>
-<p>R$25</p>
-<button onclick="comprar('Plano Pro')">Comprar</button>
+<h2>Plano Pro</h2>
+<p>R$59</p>
+<button onclick="comprar('Plano Semanal')">Comprar</button>
 </div>
 
-<!-- PRODUTO 3 -->
 <div class="card">
-<h2>Plano mensal</h2>
+<h2>Plano Premium</h2>
 <p>R$99</p>
-<button onclick="comprar('Plano Premium')">Comprar</button>
+<button onclick="comprar('Plano Mensal')">Comprar</button>
 </div>
 
 </div>
@@ -76,10 +73,17 @@ button{
 // 🔴 COLOCA SEU NÚMERO AQUI
 let numero = "27988095353"
 
+// 🔴 COLOCA SEU LINK DA IA AQUI
+let linkIA = "https://minha-loja-3.onrender.com/ia.html"
+
 function comprar(plano){
 
     let mensagem = `Olá, quero comprar o ${plano}.
-Pode me enviar o link de acesso?`
+
+Pode me enviar mais informações?
+
+Acesso da IA:
+${linkIA}`
 
     let url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensagem)
 
@@ -87,9 +91,6 @@ Pode me enviar o link de acesso?`
 }
 
 </script>
-
-</body>
-</html>
 
 </body>
 </html>
