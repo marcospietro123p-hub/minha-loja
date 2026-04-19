@@ -2,203 +2,76 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Minha IA</title>
+<title>Minha Loja</title>
 
 <style>
 body{
-    margin:0;
     font-family:Arial;
     background:#0f172a;
-}
-
-/* CONTAINER */
-#chat{
-    display:flex;
-    flex-direction:column;
-    height:100vh;
-}
-
-/* TOPO */
-#topo{
-    background:#1e293b;
     color:white;
-    padding:15px;
+    text-align:center;
+    margin:0;
+}
+
+h1{margin-top:30px;}
+
+.container{
     display:flex;
-    align-items:center;
-    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
 }
 
-.avatar{
-    width:40px;
-    height:40px;
-    border-radius:50%;
-    background:url('https://i.imgur.com/6VBx3io.png');
-    background-size:cover;
-}
-
-/* AREA BRANCA */
-#mensagens{
-    flex:1;
-    background:white;
-    padding:15px;
-    overflow:auto;
-}
-
-/* MENSAGENS */
-.msg{
-    margin:8px;
-    padding:12px;
+.card{
+    background:#1e293b;
+    padding:20px;
+    margin:15px;
     border-radius:12px;
-    max-width:70%;
-    font-size:14px;
+    width:250px;
 }
 
-.user{
-    background:#2563eb;
-    color:white;
-    margin-left:auto;
-}
-
-.bot{
-    background:#e5e7eb;
-    color:black;
-}
-
-/* INPUT */
-#inputArea{
-    display:flex;
-    padding:10px;
-    background:#1e293b;
-    gap:5px;
-}
-
-/* CAIXA TEXTO */
-#texto{
-    flex:1;
-    padding:12px;
-    border-radius:20px;
-    border:none;
-    outline:none;
-}
-
-/* BOTÕES */
 button{
-    padding:10px;
+    padding:12px;
     border:none;
-    border-radius:50%;
-    cursor:pointer;
+    border-radius:10px;
     background:#2563eb;
     color:white;
-    font-size:16px;
-}
-
-/* INPUT FILE escondido */
-#file{
-    display:none;
+    cursor:pointer;
+    width:100%;
 }
 </style>
 </head>
 
 <body>
 
-<div id="chat">
+<h1>Minha Loja 💰</h1>
 
-<!-- TOPO -->
-<div id="topo">
-<div class="avatar"></div>
-<b>Assistente IA</b>
+<div class="container">
+
+<div class="card">
+<h2>Plano Básico</h2>
+<p>R$29</p>
+<button onclick="comprar('Básico')">Comprar</button>
 </div>
 
-<!-- CHAT -->
-<div id="mensagens"></div>
+<div class="card">
+<h2>Plano Pro</h2>
+<p>R$59</p>
+<button onclick="comprar('Pro')">Comprar</button>
+</div>
 
-<!-- INPUT -->
-<div id="inputArea">
-
-<button onclick="microfone()">🎤</button>
-
-<input id="texto" placeholder="Digite sua mensagem..."
-onkeydown="if(event.key==='Enter') enviar()">
-
-<!-- input escondido -->
-<input type="file" id="file" accept="image/*">
-
-<button onclick="tirarFoto()">📷</button>
-<button onclick="enviar()">➤</button>
-
+<div class="card">
+<h2>Plano Premium</h2>
+<p>R$99</p>
+<button onclick="comprar('Premium')">Comprar</button>
 </div>
 
 </div>
 
 <script>
-
-// 🔥 COLOCA SEU LINK DO RENDER AQUI
-const API = "https://minha-loja-3.onrender.com"
-
-// ENVIAR
-async function enviar(){
-    let msg = texto.value
-    let fileInput = document.getElementById("file")
-    let file = fileInput.files[0]
-
-    if(!msg && !file) return
-
-    addMsg(msg,"user")
-    texto.value=""
-
-    let form = new FormData()
-    form.append("texto", msg)
-
-    if(file){
-        form.append("file", file)
-    }
-
-    let r = await fetch(API+"/chat",{
-        method:"POST",
-        body:form
-    })
-
-    let d = await r.json()
-
-    addMsg(d.resposta,"bot")
-    falar(d.resposta)
-
-    fileInput.value = ""
+function comprar(plano){
+ localStorage.setItem("plano",plano)
+ window.location.href="sucesso.html"
 }
-
-// ADICIONAR MSG
-function addMsg(msg,tipo){
-    let div = document.createElement("div")
-    div.className = "msg "+tipo
-    div.innerText = msg
-    mensagens.appendChild(div)
-    mensagens.scrollTop = mensagens.scrollHeight
-}
-
-// MICROFONE
-function microfone(){
-    let rec = new webkitSpeechRecognition()
-    rec.lang = "pt-BR"
-
-    rec.onresult = (e)=>{
-        texto.value = e.results[0][0].transcript
-    }
-
-    rec.start()
-}
-
-// VOZ
-function falar(texto){
-    let fala = new SpeechSynthesisUtterance(texto)
-    fala.lang = "pt-BR"
-    speechSynthesis.speak(fala)
-}
-
-// CAMERA / GALERIA
-function tirarFoto(){
-    document.getElementById("file").click()
-}
-
 </script>
 
 </body>
