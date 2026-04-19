@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Loja</title>
+
+<style>
+body{font-family:Arial;background:#f1f5f9;text-align:center}
+.card{background:white;margin:10px;padding:15px;border-radius:10px;display:inline-block}
+button{padding:10px;background:#2563eb;color:white;border:none;border-radius:5px}
+</style>
+</head>
+
+<body>
+
+<h1>🛒 Loja</h1>
+
+<div id="produtos"></div>
+
+<h2>Carrinho</h2>
+<div id="carrinho"></div>
+
+<button onclick="finalizar()">Finalizar Compra</button>
+
+<script>
+const API="http://127.0.0.1:8000"
+let cart=[]
+
+async function carregar(){
+ let r=await fetch(API+"/produtos")
+ let lista=await r.json()
+
+ produtos.innerHTML=""
+
+ lista.forEach(p=>{
+  produtos.innerHTML+=`
+  <div class="card">
+   <h3>${p.nome}</h3>
+   <p>R$ ${p.preco}</p>
+   <button onclick="add(${p.id})">Adicionar</button>
+  </div>`
+ })
+}
+
+function add(id){
+ cart.push(id)
+ render()
+}
+
+function render(){
+ carrinho.innerHTML=""
+ cart.forEach(i=>{
+  carrinho.innerHTML += "<div>Produto ID: "+i+"</div>"
+ })
+}
+
+async function finalizar(){
+ let email=prompt("Digite seu email")
+
+ let r=await fetch(API+"/checkout",{
+  method:"POST",
+  body:new URLSearchParams({
+   email:email,
+   itens:JSON.stringify(cart)
+  })
+ })
+
+ let d=await r.json()
+ window.location.href=d.url
+}
+
+carregar()
+</script>
+
+</body>
+</html>
