@@ -33,10 +33,11 @@ button{
     padding:12px;
     border:none;
     border-radius:10px;
-    background:#2563eb;
+    background:#25D366;
     color:white;
     cursor:pointer;
     width:100%;
+    font-size:16px;
 }
 </style>
 </head>
@@ -47,32 +48,48 @@ button{
 
 <div class="container">
 
+<!-- PRODUTO 1 -->
 <div class="card">
 <h2>Plano Básico</h2>
 <p>R$29</p>
-<button onclick="comprar('Básico')">Comprar</button>
+<button onclick="comprar('Plano Básico')">Comprar</button>
 </div>
 
+<!-- PRODUTO 2 -->
 <div class="card">
 <h2>Plano Pro</h2>
 <p>R$59</p>
-<button onclick="comprar('Pro')">Comprar</button>
+<button onclick="comprar('Plano Pro')">Comprar</button>
 </div>
 
+<!-- PRODUTO 3 -->
 <div class="card">
 <h2>Plano Premium</h2>
 <p>R$99</p>
-<button onclick="comprar('Premium')">Comprar</button>
+<button onclick="comprar('Plano Premium')">Comprar</button>
 </div>
 
 </div>
 
 <script>
+
+// 🔴 COLOCA SEU NÚMERO AQUI
+let numero = "5599999999999"
+
 function comprar(plano){
- localStorage.setItem("plano",plano)
- window.location.href="sucesso.html"
+
+    let mensagem = `Olá, quero comprar o ${plano}.
+Pode me enviar o link de acesso?`
+
+    let url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensagem)
+
+    window.open(url, "_blank")
 }
+
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
