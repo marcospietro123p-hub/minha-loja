@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Chat IA</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#f1f5f9;
+}
+
+/* LOGIN */
+#login{
+    text-align:center;
+    margin-top:100px;
+}
+
+input{
+    padding:10px;
+    margin:5px;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+
+/* PLANOS */
+#planos{
+    display:none;
+    text-align:center;
+}
+
+.card{
+    display:inline-block;
+    background:white;
+    padding:20px;
+    margin:10px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+/* CHAT */
+#chat{
+    display:none;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+#topo{
+    background:white;
+    padding:10px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    border-bottom:1px solid #ddd;
+}
+
+.avatar{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:url('https://i.imgur.com/6VBx3io.png');
+    background-size:cover;
+}
+
+#mensagens{
+    flex:1;
+    overflow:auto;
+    padding:15px;
+}
+
+.msg{
+    margin:6px;
+    padding:10px;
+    border-radius:12px;
+    max-width:70%;
+}
+
+.user{
+    background:#2563eb;
+    color:white;
+    margin-left:auto;
+}
+
+.bot{
+    background:white;
+    border:1px solid #ddd;
+}
+
+/* INPUT */
+#inputArea{
+    display:flex;
+    padding:10px;
+    background:white;
+    border-top:1px solid #ddd;
+}
+
+#texto{
+    flex:1;
+    padding:10px;
+    border-radius:20px;
+    border:1px solid #ccc;
+}
+
+button{
+    padding:10px;
+    margin-left:5px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+/* EMOJI */
+#emojiBox{
+    display:none;
+    position:absolute;
+    bottom:70px;
+    background:white;
+    padding:10px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+<h2>Entrar</h2>
+<input id="email" placeholder="Email"><br>
+<input id="senha" type="password" placeholder="Senha"><br>
+<button onclick="login()">Entrar</button>
+<button onclick="registro()">Criar conta</button>
+</div>
+
+<!-- PLANOS -->
+<div id="planos">
+<h2>Escolha seu plano</h2>
+
+<div class="card">
+<h3>Básico</h3>
+<p>R$29</p>
+<button onclick="pagar('basic')">Assinar</button>
+</div>
+
+<div class="card">
+<h3>Pro</h3>
+<p>R$59</p>
+<button onclick="pagar('pro')">Assinar</button>
+</div>
+
+<div class="card">
+<h3>Premium</h3>
+<p>R$99</p>
+<button onclick="pagar('premium')">Assinar</button>
+</div>
+
+</div>
+
+<!-- CHAT -->
+<div id="chat">
+
+<div id="topo">
+<div class="avatar"></div>
+<b>Assistente IA</b>
+</div>
+
+<div id="mensagens"></div>
+
+<div id="emojiBox">
+😀 😁 😂 😎 😍 🤖 👍 ❤️ 🔥
+</div>
+
+<div id="inputArea">
+<button onclick="toggleEmoji()">😊</button>
+
+<input id="texto" placeholder="Digite..." 
+onkeydown="if(event.key==='Enter') enviar()">
+
+<input type="file" id="file">
+
+<button onclick="enviar()">➤</button>
+<button onclick="falar()">🎤</button>
+</div>
+
+</div>
+
+<script>
+const API="http://127.0.0.1:8000"
+
+// REGISTRO
+async function registro(){
+ await fetch(API+"/registro",{
+  method:"POST",
+  body:new URLSearchParams({email:email.value,senha:senha.value})
+ })
+ alert("Conta criada")
+}
+
+// LOGIN
+async function login(){
+ let r=await fetch(API+"/login",{
+  method:"POST",
+  body:new URLSearchParams({email:email.value,senha:senha.value})
+ })
+
+ if(r.status!=200){
+  alert("Erro login")
+  return
+ }
+
+ let d=await r.json()
+ localStorage.setItem("token",d.token)
+
+ login.style.display="none"
+ verificarPlano()
+}
+
+// VER PLANO
+async function verificarPlano(){
+ let token=localStorage.getItem("token")
+
+ let r=await fetch(API+"/me?token="+token)
+ let d=await r.json()
+
+ if(d.ativo==1){
+  abrirChat()
+ }else{
+  planos.style.display="block"
+ }
+}
+
+// PAGAMENTO
+async function pagar(plano){
+ let r=await fetch(API+"/checkout",{
+  method:"POST",
+  body:new URLSearchParams({
+   email:email.value,
+   plano:plano
+  })
+ })
+
+ let d=await r.json()
+ window.location.href=d.url
+}
+
+// ABRIR CHAT
+function abrirChat(){
+ planos.style.display="none"
+ chat.style.display="flex"
+}
+
+// ENVIAR
+async function enviar(){
+ let textoMsg=texto.value
+ if(!textoMsg) return
+
+ addMsg(textoMsg,"user")
+ texto.value=""
+
+ let token=localStorage.getItem("token")
+
+ let form=new FormData()
+ form.append("token",token)
+ form.append("texto",textoMsg)
+
+ if(file.files[0]){
+  form.append("file",file.files[0])
+ }
+
+ let r=await fetch(API+"/chat",{method:"POST",body:form})
+ let d=await r.json()
+
+ addMsg(d.resposta,"bot")
+}
+
+// MOSTRAR MSG
+function addMsg(msg,tipo){
+ let div=document.createElement("div")
+ div.className="msg "+tipo
+ div.innerText=msg
+ mensagens.appendChild(div)
+ mensagens.scrollTop=mensagens.scrollHeight
+}
+
+// VOZ
+function falar(){
+ let rec=new webkitSpeechRecognition()
+ rec.lang="pt-BR"
+
+ rec.onresult=(e)=>{
+  texto.value=e.results[0][0].transcript
+ }
+
+ rec.start()
+}
+
+// EMOJI
+function toggleEmoji(){
+ emojiBox.style.display =
+ emojiBox.style.display=="block" ? "none":"block"
+}
+
+emojiBox.onclick=(e)=>{
+ texto.value += e.target.innerText
+}
+</script>
+
+</body>
+</html>
